@@ -9,3 +9,4 @@
 # TODO: verify aggregated signature
 
 # TODO: print results at each step
+# TODO: print final result, time, and signature size (compare with an without aggregation)
