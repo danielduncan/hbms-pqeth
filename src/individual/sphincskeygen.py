@@ -2,7 +2,8 @@ import oqs
 
 #Define the algorithm used from liboqs.
 algo = "SPHINCS+-SHAKE-256f-robust+"
-
+print(oqs.get_enabled_sig_mechanisms())
+"""
 with oqs.Signature(algo) as signer:
     print("Algorithm:", signer.details)
 
@@ -22,3 +23,4 @@ with oqs.Signature(algo) as signer:
     # Verify the signature
     valid = signer.verify(message, signature, pk)
     print("Signature valid:", valid)
+"""
