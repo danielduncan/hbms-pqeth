@@ -1,7 +1,7 @@
 from src.individual.keygen import generate_key
 from src.individual.sign import sign_message
 from src.aggregation.aggregate import aggregate_signatures
-from src.aggregation.proof import verify_signature
+from src.individual.verify import verify_signature
 
 # TODO: demo script
 # TODO: print results at each step
