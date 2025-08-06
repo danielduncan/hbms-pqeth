@@ -13,7 +13,7 @@ def main():
     print(f"Generating keypairs for {validators} validators")
     time_start = time()
     keys = [generate_key() for _ in range(validators)]
-    print(f"Generated {len(keys)} keys in {time() - time_start} seconds:")
+    print(f"Generated {len(keys)} keys in {time() - time_start:.3f} seconds:")
 
     for validator in keys:
         print(f"Validator {keys.index(validator)} has public key {validator[1].hex()} and secret keys:")
@@ -35,7 +35,7 @@ def main():
         print(f"Verifying validator {i}'s signatures:")
         time_start = time()
         print(f"\t Signature valid: {verify_signature(sig, message, pk)}")
-        print(f"\t Verification took {time() - time_start} seconds")
+        print(f"\t Verification took {time() - time_start:.3f} seconds")
 
     # TODO: aggregate signatures
     # aggregated_signature = aggregate_signatures(signatures)
