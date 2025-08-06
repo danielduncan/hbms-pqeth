@@ -4,13 +4,10 @@ from src.individual.sign import sign_message
 # from src.aggregation.aggregate import aggregate_signatures
 from src.individual.verify import verify_signature
 
-# TODO: demo script
-# TODO: print results at each step
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
     message = "placeholder".ljust(64, ' ')
     print(f"Message to validate: {message}")
-
 
     validators = 3
     print(f"Generating keypairs for {validators} validators")
@@ -18,12 +15,13 @@ def main():
     keys = [generate_key() for _ in range(validators)]
     print(f"Generated {len(keys)} keys in {time() - time_start} seconds:")
 
-    for i, validator in enumerate(keys):
-        for j, (sk, pk) in enumerate(validator):
-            print(f"Validator {i} for chunk {j}\n\t pk: {pk.hex()}\n\t sk: {sk.hex()}")
+    for validator in keys:
+        print(f"Validator {keys.index(validator)} has keypairs:")
+        for sk, pk in validator:
+            print(f"\t pk: {pk.hex()}\n\t sk: {sk.hex()}")
 
 
-    print("Signing message with sk")
+    print("Each validator now signs the message")
     time_start = time()
     signatures = []
     for validator in keys:
@@ -33,19 +31,18 @@ def main():
 
     print(f"Signed message with {len(signatures)} signatures in {time() - time_start} seconds")
 
+    print("Verifying individual signatures")
+    for i, (pk, sig) in enumerate(signatures):
+        print(f"Verifying validator {i}'s signature:")
+        time_start = time()
+        print(f"\t Signature valid: {verify_signature(sig, message, pk)}")
+        print(f"\t Verification took {time() - time_start} seconds")
+
     # TODO: aggregate signatures
     # aggregated_signature = aggregate_signatures(signatures)
 
-    # TODO: verify signatures
-    for pk, sig in signatures:
-        print(f"Verifying signatures")
-        time_start = time()
-        print(f"Signature valid: {verify_signature(sig, message, pk)}")
-        print(f"Verification took {time() - time_start} seconds")
-    
-    # valid = verify_signature(aggregated_signature, message, )
-
-    # TODO: print final result, time, and signature size (compare with an without aggregation)
+    # TODO: verify aggregated signature
+    # valid = verify_signature(aggregated_signature, message)
 
 if __name__ == "__main__":
     main()
