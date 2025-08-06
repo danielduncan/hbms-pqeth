@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from src.individual.utils import H
 from src.individual import l
 import textwrap
@@ -12,3 +12,11 @@ def sign_message(sk: List[bytes], message: str) -> List[bytes]:
         sig.append(H(sk[i], x))
 
     return sig
+
+def xmss_sign(slots: List[List[bytes]], index: int, message: str, paths: List[List[bytes]]) -> Tuple[int, List[bytes], List[bytes]]:
+    sk = slots[index]
+    path = paths[index]
+
+    wots = sign_message(sk, message)
+
+    return (index, wots, path)

@@ -1,7 +1,7 @@
 from os import urandom
 from typing import Tuple, List
-from src.individual import l
-from src.individual.utils import H, PRF
+from src.individual import l, k
+from src.individual.utils import H, PRF, merkle_tree
 
 # generate secret key sk by randomly sampling a sequence of bits
 def WOTS_sk(seed: bytes) -> bytes:
@@ -27,3 +27,16 @@ def generate_key() -> Tuple[List[bytes], bytes]:
 
     # aggregate public keys into one
     return (sks, H(b''.join(pks)))
+
+def xmss_keygen() -> Tuple[List[List[bytes]], bytes, List[List[bytes]]]:
+    slots = []
+    leaves = []
+    # tree depth is k, so generate 2^k secret keys (leaves)
+    for _ in range(2 ** k):
+       sks, pk = generate_key()
+       slots.append(sks)
+       leaves.append(pk)
+
+    root, paths = merkle_tree(leaves)
+
+    return (slots, root, paths)
