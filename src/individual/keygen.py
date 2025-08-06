@@ -1,5 +1,6 @@
 from os import urandom
-from typing import Tuple
+from typing import Tuple, List
+from src.individual import l
 from src.individual.utils import H, PRF
 
 # generate secret key sk by randomly sampling a sequence of bits
@@ -11,8 +12,15 @@ def WOTS_pk(sk: bytes) -> bytes:
     # n = 16 for demo performance - NEVER USE IN PRODUCTION
     return H(sk, 2**16 - 1)
 
-# Simple Winternitz One-Time Signature
-def generate_key() -> Tuple[bytes, bytes]:
-    seed = urandom(32)
+# Parallelisable Winternitz One-Time Signature
+def generate_key() -> List[Tuple[bytes, bytes]]:
+    keys = []
 
-    return (WOTS_sk(seed), WOTS_pk(WOTS_sk(seed)))
+    # generate a key pair for each chunk
+    for _ in range(l):
+        seed = urandom(32)
+        sk = WOTS_sk(seed)
+        pk = WOTS_pk(sk)
+        keys.append((sk, pk))
+
+    return keys

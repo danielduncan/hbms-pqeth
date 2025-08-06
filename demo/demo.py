@@ -8,20 +8,29 @@ from src.individual.verify import verify_signature
 # TODO: print results at each step
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
-    message = "placeholder"
+    message = "placeholder".ljust(64, ' ')
     print(f"Message to validate: {message}")
 
-    validators = 5
+
+    validators = 3
     print(f"Generating keypairs for {validators} validators")
     time_start = time()
     keys = [generate_key() for _ in range(validators)]
     print(f"Generated {len(keys)} keys in {time() - time_start} seconds:")
-    for i, (sk, pk) in enumerate(keys):
-        print(f"Validator {i}\n\t pk: {pk.hex()}\n\t sk: {sk.hex()}")
+
+    for i, validator in enumerate(keys):
+        for j, (sk, pk) in enumerate(validator):
+            print(f"Validator {i} for chunk {j}\n\t pk: {pk.hex()}\n\t sk: {sk.hex()}")
+
 
     print("Signing message with sk")
     time_start = time()
-    signatures = [(pk, sign_message(sk, message)) for (sk, pk) in keys]
+    signatures = []
+    for validator in keys:
+        sk = [sk for sk, _ in validator]
+        pk = [pk for _, pk in validator]
+        signatures.append((pk, sign_message(sk, message)))
+
     print(f"Signed message with {len(signatures)} signatures in {time() - time_start} seconds")
 
     # TODO: aggregate signatures
@@ -29,7 +38,7 @@ def main():
 
     # TODO: verify signatures
     for pk, sig in signatures:
-        print(f"Verifying signature with pk: {pk.hex()} and sig: {sig.hex()}")
+        print(f"Verifying signatures")
         time_start = time()
         print(f"Signature valid: {verify_signature(sig, message, pk)}")
         print(f"Verification took {time() - time_start} seconds")

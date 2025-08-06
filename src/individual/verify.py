@@ -1,12 +1,17 @@
 # verify signature - simple Winternitz One-Time Signature
+from typing import List
 from src.individual.utils import H
+from src.individual import l
+import textwrap
 
-def verify_signature(sig, message, pk):
-    h = H(message.encode('ascii'))
-    x = int.from_bytes(h, 'big')
+def verify_signature(sig: List[bytes], message: str, pk: List[bytes]) -> bool:
+    valid = []
+    for i, chunk in enumerate(textwrap.wrap(message, len(message) // l)):
+        h = H(chunk.encode('ascii'))
+        x = int.from_bytes(h, 'big')
 
-    j = (2 ** 16 - 1) - x
+        j = (2 ** 16 - 1) - x
 
-    validity = (pk == H(sig, j))
+        valid.append((pk[i] == H(sig[i], j)))
 
-    return validity
+    return all(valid)

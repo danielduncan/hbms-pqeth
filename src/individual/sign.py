@@ -1,11 +1,14 @@
-# TODO: message signing - simple Winternitz One-Time Signature
+from typing import List
 from src.individual.utils import H
+from src.individual import l
+import textwrap
 
-# w = 16 # message split into chunks of w bits
-
-def sign_message(sk, message):
-    h = H(message.encode('ascii'))
-    x = int.from_bytes(h, 'big')
-    sig = H(sk, x)
+# Message signing with parallelisable Winternitz One-Time Signature
+def sign_message(sk: List[bytes], message: str) -> List[bytes]:
+    sig = []
+    for i, chunk in enumerate(textwrap.wrap(message, len(message) // l)):
+        h = H(chunk.encode('ascii'))
+        x = int.from_bytes(h, 'big')
+        sig.append(H(sk[i], x))
 
     return sig
