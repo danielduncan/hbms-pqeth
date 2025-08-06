@@ -1,10 +1,11 @@
-from time import time, time_ns
-from src.individual.keygen import generate_key, xmss_keygen
-from src.individual.sign import sign_message, xmss_sign
-# from src.aggregation.aggregate import aggregate_signatures
-from src.individual.verify import verify_signature, xmss_verify
-from src.individual import k, l
+from time import time
 from random import randint
+
+from src.individual import k, l
+
+from src.individual.keygen import xmss_keygen
+from src.individual.sign import xmss_sign
+from src.individual.verify import xmss_verify
 
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
@@ -47,12 +48,6 @@ def main():
         print(f"\t Path: {[p.hex() for p in sig[2]]}")
         print(f"\t Signature valid: {xmss_verify(sig, message, pk)}")
         print(f"\t Verification took {time() - time_start:.3f} seconds")
-
-    # TODO: aggregate signatures
-    # aggregated_signature = aggregate_signatures(signatures)
-
-    # TODO: verify aggregated signature
-    # valid = verify_signature(aggregated_signature, message)
 
 if __name__ == "__main__":
     main()

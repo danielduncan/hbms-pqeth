@@ -1,31 +1,37 @@
-# verify signature - simple Winternitz One-Time Signature
 from typing import List, Tuple
 from src.individual.utils import H, get_chunks, merkle_root
-from src.individual import l
+from src.individual import l, n
 
+# standard Winternitz One-Time Signature (WOTS) signature verification
 def verify_wots(sig: List[bytes], message: str) -> bytes:
     w: int = len(message) // l
-    chunk_pks = []
+    # each chunk has a pk
+    pks: List[bytes] = []
 
     for i, chunk in enumerate(get_chunks(message, w)):
         h = H(chunk.encode('ascii'))
         x = int.from_bytes(h, 'big')
 
-        j = (2 ** 16 - 1) - x
+        # number of times required to hash the signature to get the original pk
+        j = (2 ** n - 1) - x
 
         chunk_pk = H(sig[i], j)
-        chunk_pks.append(chunk_pk)
+        pks.append(chunk_pk)
     
-    return H(b''.join(chunk_pks))
+    # aggregate pks into one that should match the signers public key
+    return H(b''.join(pks))
 
 def verify_signature(sig: List[bytes], message: str, pk: bytes) -> bool:
     return pk == verify_wots(sig, message)
 
-# sig <- (index, wots, path)
+# eXtended Merkle Signature Scheme (XMSS) signature verification
 def xmss_verify(sig: Tuple[int, List[bytes], List[bytes]], message: str, pk: bytes) -> bool:
-    index, wots_sig, path = sig
+    index, wots, path = sig
     
-    leaf = verify_wots(wots_sig, message)
-    computed_root = merkle_root(leaf, path, index)
+    # compute leaf (pk) associated with given WOTS signature
+    leaf = verify_wots(wots, message)
+    # compute Merkle root associated with given pk and path
+    root = merkle_root(leaf, path, index)
     
-    return computed_root == pk
+    # if the Merkle root from public key and path matches the public key given WOTS, signature is valid 
+    return root == pk

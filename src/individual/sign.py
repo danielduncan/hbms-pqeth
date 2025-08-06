@@ -2,11 +2,12 @@ from typing import List, Tuple
 from src.individual.utils import H, get_chunks
 from src.individual import l
 
-# Message signing with parallelisable Winternitz One-Time Signature
+# standard Winternitz One-Time Signature (WOTS) message signing
 def sign_message(sk: List[bytes], message: str) -> List[bytes]:
     w: int = len(message) // l
     sig: List[bytes] = []
 
+    # sign each message chunk of length w
     for i, chunk in enumerate(get_chunks(message, w)):
         h = H(chunk.encode('ascii'))
         x = int.from_bytes(h, 'big')
@@ -14,10 +15,14 @@ def sign_message(sk: List[bytes], message: str) -> List[bytes]:
 
     return sig
 
+# eXtended Merkle Signature Scheme (XMSS) message signing
 def xmss_sign(slots: List[List[bytes]], index: int, message: str, paths: List[List[bytes]]) -> Tuple[int, List[bytes], List[bytes]]:
+    # index dictates which slot is used
     sk = slots[index]
+    # precomputed path corresponding to the slot index will verify the signature
     path = paths[index]
 
+    # sign with WOTS
     wots = sign_message(sk, message)
 
     return (index, wots, path)
