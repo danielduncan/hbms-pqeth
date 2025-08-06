@@ -37,7 +37,6 @@ def main():
     # valid = verify_signature(aggregated_signature, message, )
 
     # TODO: print final result, time, and signature size (compare with an without aggregation)
-    print(f"{'valid' if valid else 'invalid'} signature")
 
 if __name__ == "__main__":
     main()
