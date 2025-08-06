@@ -1,12 +1,13 @@
 # verify signature - simple Winternitz One-Time Signature
 from typing import List, Tuple
-from src.individual.utils import H, merkle_root
+from src.individual.utils import H, get_chunks, merkle_root
 from src.individual import l
-import textwrap
 
 def verify_wots(sig: List[bytes], message: str) -> bytes:
+    w: int = len(message) // l
     chunk_pks = []
-    for i, chunk in enumerate(textwrap.wrap(message, len(message) // l)):
+
+    for i, chunk in enumerate(get_chunks(message, w)):
         h = H(chunk.encode('ascii'))
         x = int.from_bytes(h, 'big')
 

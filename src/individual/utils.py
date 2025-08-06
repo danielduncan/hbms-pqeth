@@ -37,7 +37,6 @@ def merkle_tree(leaves: List[bytes]) -> Tuple[bytes, List[List[bytes]]]:
 
     return (root, paths)
 
-# double check this function
 def merkle_root(pk: bytes, path: List[bytes], index: int) -> bytes:
     node = pk
     for sibling in path:
@@ -48,3 +47,6 @@ def merkle_root(pk: bytes, path: List[bytes], index: int) -> bytes:
         index //= 2
 
     return node
+
+def get_chunks(message: str, w: int) -> List[str]:
+    return [message[i:i + w] for i in range(0, len(message), w)]

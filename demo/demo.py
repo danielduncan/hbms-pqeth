@@ -3,12 +3,14 @@ from src.individual.keygen import generate_key, xmss_keygen
 from src.individual.sign import sign_message, xmss_sign
 # from src.aggregation.aggregate import aggregate_signatures
 from src.individual.verify import verify_signature, xmss_verify
-from src.individual import k
+from src.individual import k, l
 from random import randint
 
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
-    message = "placeholder message for demo".ljust(32, ' ')
+    message = "placeholder message for demo"
+    w = -(len(message) // -l)
+    message = message.ljust(w * l, ' ') # pad to multiple of l - in prod message would be fixed length
     print(f"Message to validate: {message}")
 
     validators = 3
