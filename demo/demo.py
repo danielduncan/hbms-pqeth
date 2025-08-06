@@ -1,7 +1,7 @@
 from time import time, time_ns
 from src.individual.keygen import generate_key
 from src.individual.sign import sign_message
-from src.aggregation.aggregate import aggregate_signatures
+# from src.aggregation.aggregate import aggregate_signatures
 from src.individual.verify import verify_signature
 
 # TODO: demo script

@@ -1,5 +1,4 @@
 import hashlib
-from typing import List
 
 def H(x: bytes, n: int = 1) -> bytes:
     # hash n times

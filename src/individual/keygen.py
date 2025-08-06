@@ -1,6 +1,6 @@
 from os import urandom
-from typing import Tuple, List
-from src.individual.utils import H, PRF, merkle_tree
+from typing import Tuple
+from src.individual.utils import H, PRF
 
 # generate secret key sk by randomly sampling a sequence of bits
 def WOTS_sk(seed: bytes) -> bytes:
