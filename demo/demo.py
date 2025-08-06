@@ -6,7 +6,7 @@ from src.individual.verify import verify_signature
 
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
-    message = "placeholder".ljust(64, ' ')
+    message = "placeholder message for demo".ljust(32, ' ')
     print(f"Message to validate: {message}")
 
     validators = 3
@@ -16,24 +16,23 @@ def main():
     print(f"Generated {len(keys)} keys in {time() - time_start} seconds:")
 
     for validator in keys:
-        print(f"Validator {keys.index(validator)} has keypairs:")
-        for sk, pk in validator:
-            print(f"\t pk: {pk.hex()}\n\t sk: {sk.hex()}")
+        print(f"Validator {keys.index(validator)} has public key {validator[1].hex()} and secret keys:")
+        for sk in validator[0]:
+            print(f"\t sk: {sk.hex()}")
 
 
     print("Each validator now signs the message")
     time_start = time()
     signatures = []
     for validator in keys:
-        sk = [sk for sk, _ in validator]
-        pk = [pk for _, pk in validator]
-        signatures.append((pk, sign_message(sk, message)))
+        sks = validator[0]
+        pk = validator[1]
+        signatures.append((pk, sign_message(sks, message)))
 
-    print(f"Signed message with {len(signatures)} signatures in {time() - time_start} seconds")
-
+    print(f"Signed message with {validators} validators in {time() - time_start} seconds")
     print("Verifying individual signatures")
     for i, (pk, sig) in enumerate(signatures):
-        print(f"Verifying validator {i}'s signature:")
+        print(f"Verifying validator {i}'s signatures:")
         time_start = time()
         print(f"\t Signature valid: {verify_signature(sig, message, pk)}")
         print(f"\t Verification took {time() - time_start} seconds")

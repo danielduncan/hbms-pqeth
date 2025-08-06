@@ -13,14 +13,17 @@ def WOTS_pk(sk: bytes) -> bytes:
     return H(sk, 2**16 - 1)
 
 # Parallelisable Winternitz One-Time Signature
-def generate_key() -> List[Tuple[bytes, bytes]]:
-    keys = []
+def generate_key() -> Tuple[List[bytes], bytes]:
+    sks = []
+    pks = []
 
     # generate a key pair for each chunk
     for _ in range(l):
         seed = urandom(32)
         sk = WOTS_sk(seed)
         pk = WOTS_pk(sk)
-        keys.append((sk, pk))
+        sks.append(sk)
+        pks.append(pk)
 
-    return keys
+    # aggregate public keys into one
+    return (sks, H(b''.join(pks)))
