@@ -1,10 +1,9 @@
-import hashlib
 from typing import List, Tuple
-from src.individual import HashTweaks
+from src.individual import HASH_FUNCTION, HashTweaks
 
 # secure hash function H, which can hash n times, and can take a tweak
 # defaults to SHA-256, but can be changed to any secure hash function
-def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = hashlib.sha256) -> bytes:
+def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HASH_FUNCTION) -> bytes:
     # hash n times
     for _ in range(n):
         # a hash tweak of form H(x + a) makes hashes distinct for identical x

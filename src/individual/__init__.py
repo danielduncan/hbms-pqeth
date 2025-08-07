@@ -1,4 +1,7 @@
 from enum import Enum
+from hashlib import sha256
+
+HASH_FUNCTION = sha256
 
 # l = 4 is small - probably insecure
 l = 4 # message split into l chunks of w bits
