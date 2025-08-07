@@ -79,14 +79,15 @@ def test_merkle_root():
         assert expected_root == root
 
 def test_get_chunks():
+    # setup
     str_a = '01101100'
     str_b = '10100110'
     data = str_a + str_b
 
     expected_chunks = ['01', '10', '11', '00', '10', '10', '01', '10']
 
+    # get_chunks
     chunks = get_chunks(data, 2)
-    print(chunks)
     assert len(chunks) == 8
     assert chunks == expected_chunks
 
