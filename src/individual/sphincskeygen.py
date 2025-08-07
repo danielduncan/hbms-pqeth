@@ -26,7 +26,7 @@ def oqs_keygen(algo = default_algo):
 """
 time the signing and verification of an algorithm from liboqs (Default iterations is 50 iterations, and algorithm is defined above)
 """
-def time_sign_verif(msg = "hello world",num_iterations = 50 ,algo = default_algo):
+def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_algo):
     #Try to open an existing pk/sk pair, if it does not exist, generate one.
     try:
         with open("sphincs_pk.bin", "rb") as f:
@@ -34,18 +34,25 @@ def time_sign_verif(msg = "hello world",num_iterations = 50 ,algo = default_algo
         with open("sphincs_sk.bin", "rb") as f:
             sk = f.read()
     except FileNotFoundError:
-        oqs(oqs_keygen(algo))
+        oqs_keygen(algo)
         with open("sphincs_pk.bin", "rb") as f:
             pk = f.read()
         with open("sphincs_sk.bin", "rb") as f:
             sk = f.read()
-    signer = oqs.Signature(algo, secret_key= sk)
+    
+    try:
+        signer = oqs.Signature(algo, secret_key= sk)
+    except:
+        oqs_keygen(algo)
+        with open("sphincs_pk.bin", "rb") as f:
+            pk = f.read()
+        with open("sphincs_sk.bin", "rb") as f:
+            sk = f.read()
+        signer = oqs.Signature(algo, secret_key= sk)
     print("Algorithm:", signer.details)
     sign_times = []
     verify_times = []
     
-
-    signer.import_secret_key(sk)
     for _ in range(num_iterations):
         start = time.perf_counter()
         signature = signer.sign(msg)
@@ -62,6 +69,7 @@ def time_sign_verif(msg = "hello world",num_iterations = 50 ,algo = default_algo
     assert valid, "Verification step failed"
     return {"sign_times": sign_times,"verify_times": verify_times}
 
+oqs_keygen()
 num_iterations = 50
 res = time_sign_verif()
 sign_times = res["sign_times"]
