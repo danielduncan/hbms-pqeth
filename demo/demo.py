@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from time import time
 from random import randint
 
-from src.individual import k, l
+from src.individual import k
 
 from src.individual.keygen import xmss_keygen
 from src.individual.sign import xmss_sign
@@ -12,8 +12,6 @@ def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
     epoch = randint(0, 100) # arbitrary epoch number
     message = "placeholder message for demo"
-    w = -(len(message) // -l) # ceiling division to overestimate w
-    message = message.ljust(w * l, ' ') # pad to multiple of l - in prod message would be fixed length
     print(f"Message to validate: {message}")
 
     validators = randint(2, 6)
@@ -27,8 +25,8 @@ def main():
         print(f"Verifying validator {i}'s signatures:")
         time_start = time()
         print(f"\t Public key: {pk.hex()}")
-        print(f"\t Signature: {[s.hex() for s in sig[1]]}")
-        print(f"\t Path: {[p.hex() for p in sig[2]]}")
+        print(f"\t Signature (truncated): {[s.hex()[0:4] for s in sig[1]]}")
+        print(f"\t Path (truncated): {[p.hex()[0:4] for p in sig[2]]}")
         print(f"\t Signature valid: {xmss_verify(sig, message, pk)}")
         print(f"\t Verification took {time() - time_start:.3f} seconds")
 

@@ -1,6 +1,6 @@
 from os import urandom
 from typing import Tuple, List
-from src.individual import HashTweaks, l, k, n, KEY_LIFETIME
+from src.individual import HashTweaks, l, k, w, KEY_LIFETIME
 from src.individual.utils import H, PRF, merkle_tree
 from concurrent.futures import ThreadPoolExecutor
 
@@ -8,9 +8,9 @@ from concurrent.futures import ThreadPoolExecutor
 def WOTS_sk(seed: bytes) -> bytes:
     return PRF(seed)
 
-# generate public key pk, by hashing sk (H(sk)) 2^n-1 times, where n is the number of bits a secure hash function H outputs
+# generate public key pk, by hashing sk w times (H^w(sk))
 def WOTS_pk(sk: bytes) -> bytes:
-    return H(sk, n=2**n - 1, tweak=HashTweaks.CHAIN.value)
+    return H(sk, n=w, tweak=HashTweaks.CHAIN.value)
 
 # standard Winternitz One-Time Signature (WOTS) key generation
 def generate_key() -> Tuple[List[bytes], bytes]:

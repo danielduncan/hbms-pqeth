@@ -1,17 +1,16 @@
 from typing import List, Tuple
-from src.individual import HASH_FUNCTION, HashTweaks, HASH_LENGTH
+from src.individual import HASH_FUNCTION, HashTweaks
 
 # secure hash function H, which can hash n times, and can take a tweak
 # defaults to SHA-256, but can be changed to any secure hash function
-def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HASH_FUNCTION, length: int = HASH_LENGTH) -> bytes:
+def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HASH_FUNCTION) -> bytes:
     # hash n times
     for _ in range(n):
         # a hash tweak of form H(x + a) makes hashes distinct for identical x
         # tweaks correspond to the application of the hash
         # tweaks are necessary to ensure different but related processes do not collide
         tweaked = x + tweak.to_bytes(1, byteorder='big')
-        # hash truncated to n bits for demo performance - THIS IS COMPLETELY INSECURE - NEVER USE IN PRODUCTION
-        x = function(tweaked).digest()[0:length]
+        x = function(tweaked).digest()
 
     return x
 
@@ -59,5 +58,5 @@ def merkle_root(pk: bytes, path: List[bytes], index: int) -> bytes:
     return node
 
 # split message into l chunks of length w
-def get_chunks(message: str, w: int) -> List[str]:
-    return [message[i:i + w] for i in range(0, len(message), w)]
+def get_chunks(message: bytes, w: int) -> List[bytes]:
+    return [message[i:i + w // 8] for i in range(0, len(message), w // 8)]
