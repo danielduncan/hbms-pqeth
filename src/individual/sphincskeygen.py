@@ -11,7 +11,6 @@ print(oqs.get_enabled_sig_mechanisms())
 #generates a pk/sk pair and writes them to a file, use this if you need fixed keys for benchmarking.
 def oqs_keygen(algo = default_algo):
     signer = oqs.Signature(algo)
-    print("Algorithm:", signer.details)
 
     # Generate a keypair
     pk = signer.generate_keypair()
@@ -25,6 +24,7 @@ def oqs_keygen(algo = default_algo):
 
 """
 time the signing and verification of an algorithm from liboqs (Default iterations is 50 iterations, and algorithm is defined above)
+Message must be a byte string.
 """
 def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_algo):
     #Try to open an existing pk/sk pair, if it does not exist, generate one.
@@ -40,15 +40,7 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
         with open("sphincs_sk.bin", "rb") as f:
             sk = f.read()
     
-    try:
-        signer = oqs.Signature(algo, secret_key= sk)
-    except:
-        oqs_keygen(algo)
-        with open("sphincs_pk.bin", "rb") as f:
-            pk = f.read()
-        with open("sphincs_sk.bin", "rb") as f:
-            sk = f.read()
-        signer = oqs.Signature(algo, secret_key= sk)
+    signer = oqs.Signature(algo, secret_key= sk)
     print("Algorithm:", signer.details)
     sign_times = []
     verify_times = []
@@ -69,9 +61,11 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
     assert valid, "Verification step failed"
     return {"sign_times": sign_times,"verify_times": verify_times}
 
+#Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
 oqs_keygen()
-num_iterations = 50
+
 res = time_sign_verif()
+num_iterations = 50
 sign_times = res["sign_times"]
 verify_times = res["verify_times"]
 print(f"Average signing time:  {sum(sign_times) / num_iterations * 1000:.2f} ms")
