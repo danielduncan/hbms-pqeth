@@ -3,14 +3,15 @@ import math
 import random
 import string
 from src.aggregation.aggregate import aggregate_signatures
-from src.individual import n, k, l
+from src.individual import n, k, l, HashTweaks
 from src.individual.keygen import generate_key, xmss_keygen
 from src.individual.sign import sign_message, xmss_sign
-from src.individual.utils import H, PRF, merkle_tree, merkle_tree, get_chunks
-from src.individual.verify import verify_signature
+from src.individual.utils import H, PRF, merkle_tree, merkle_root, get_chunks
+from src.individual.verify import verify_signature, xmss_verify
 
 message_length = 4 * l # length of message must be divisible by l for sign_message to work
 message = ''.join(random.choices(string.ascii_letters + string.digits, k = message_length))
+index = random.randint(0, 2 ** k) # random index for slots
 
 def test_generate_key():
     # generate_key
@@ -23,6 +24,15 @@ def test_generate_key():
         assert isinstance(sk, bytes)
         assert len(sk) == 2
 
+def test_xmss_keygen():
+    # xmss_keygen
+    slots, root, paths = xmss_keygen()
+
+    for sks in slots:
+        for sk in sks:
+            assert isinstance(sk, bytes)
+            assert len(sk) == 2
+
 def test_sign_message():
     # setup
     sks, pk = generate_key()
@@ -33,6 +43,31 @@ def test_sign_message():
         assert isinstance(sig, bytes)
     str_sig = ''.join(b.decode('latin1') for b in signatures)
     assert str_sig != message
+
+def test_xmss_sign():
+    # setup
+    slots, root, paths = xmss_keygen()
+
+    # xmss_sign
+    _, wots, path = xmss_sign(slots, index, message, paths)
+    for sig in wots:
+        assert isinstance(sig, bytes)
+    str_sig = ''.join(b.decode('latin1') for b in wots)
+    assert str_sig != message
+    assert path == paths[index]
+
+def test_merkle_tree():
+    # setup
+    leaves = [b'a', b'b', b'c', b'd']
+    H1 = H(b'a' + b'b', tweak=HashTweaks.TREE.value)
+    H2 = H(b'c' + b'd', tweak=HashTweaks.TREE.value)
+    expected_root = H(H1 + H2, tweak=HashTweaks.TREE.value)
+    expected_paths = [[b'b', H2], [b'a', H2], [b'd', H1], [b'c', H1]]
+
+    # merkle_tree
+    root, paths = merkle_tree(leaves)
+    assert root == expected_root
+    assert paths == expected_paths
 
 def test_get_chunks():
     str_a = '01101100'
@@ -58,3 +93,11 @@ def test_verify_signature():
 
     # verify_signature
     assert verify_signature(signature, message, pk)
+
+def test_xmss_verify():
+    # setup
+    slots, root, paths = xmss_keygen()
+    sig = xmss_sign(slots, index, message, paths)
+
+    # xmss_verify
+    assert xmss_verify(sig, message, root)
