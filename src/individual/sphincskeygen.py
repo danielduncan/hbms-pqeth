@@ -31,6 +31,7 @@ def oqs_keygen(algo = default_algo):
 time the signing and verification of an algorithm from liboqs (Default iterations is 50 iterations, and algorithm is defined above)
 Message must be a byte string.
 Returns a dictionary with the list of sign times and verification times.
+algo must be one defined by the liboqs library. 
 """
 def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_algo):
     #Try to open an existing pk/sk pair, if it does not exist, generate one.
@@ -71,12 +72,17 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
     
     return {"sign_times": sign_times,"verify_times": verify_times}
 
-#Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
-oqs_keygen()
 
-res = time_sign_verif()
-num_iterations = 50
-sign_times = res["sign_times"]
-verify_times = res["verify_times"]
-print(f"Average signing time:  {sum(sign_times) / num_iterations * 1000:.2f} ms")
-print(f"Average verify time:   {sum(verify_times) / num_iterations * 1000:.2f} ms")
+#Example benchmarking script for sphincs+, can be made flexible to compare other schemes.
+def example_benchmark():
+    #Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
+    oqs_keygen()
+    res = time_sign_verif()
+    num_iterations = 50
+    sign_times = res["sign_times"]
+    verify_times = res["verify_times"]
+    print(f"Average signing time:  {sum(sign_times) / num_iterations * 1000:.2f} ms")
+    print(f"Average verify time:   {sum(verify_times) / num_iterations * 1000:.2f} ms")
+
+if __name__ == "__main__":
+    example_benchmark()
