@@ -7,15 +7,8 @@ def verify_wots(sig: List[bytes], message: str) -> bytes:
     # each chunk has a pk
     pks: List[bytes] = []
 
-<<<<<<< HEAD
-    for i, chunk in enumerate(get_chunks(message, w)):
-        h = H(chunk.encode('ascii'), tweak=HashTweaks.MESSAGE.value)
-        x = int.from_bytes(h, 'big')
-        T += x
-=======
     for i, chunk in enumerate(get_chunks(H(message.encode('ascii'), tweak=HashTweaks.MESSAGE.value), w)):
         x = int.from_bytes(chunk, 'big') % w
->>>>>>> main
 
         # number of times required to hash the signature to get the original pk
         j = w - x
