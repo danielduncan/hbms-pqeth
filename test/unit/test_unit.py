@@ -69,6 +69,15 @@ def test_merkle_tree():
     assert root == expected_root
     assert paths == expected_paths
 
+def test_merkle_root():
+    # setup
+    leaves = [b'a', b'b', b'c', b'd']
+    root, paths = merkle_tree(leaves)
+
+    for index, leaf in enumerate(leaves):
+        expected_root = merkle_root(leaf, paths[index], index)
+        assert expected_root == root
+
 def test_get_chunks():
     str_a = '01101100'
     str_b = '10100110'
