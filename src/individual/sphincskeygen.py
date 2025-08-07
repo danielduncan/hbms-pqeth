@@ -1,3 +1,8 @@
+"""
+Refer to the github to install liboqs.
+https://github.com/open-quantum-safe/liboqs-python
+"""
+
 import oqs
 import time
 
@@ -25,6 +30,7 @@ def oqs_keygen(algo = default_algo):
 """
 time the signing and verification of an algorithm from liboqs (Default iterations is 50 iterations, and algorithm is defined above)
 Message must be a byte string.
+Returns a dictionary with the list of sign times and verification times.
 """
 def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_algo):
     #Try to open an existing pk/sk pair, if it does not exist, generate one.
@@ -40,18 +46,20 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
         with open("sphincs_sk.bin", "rb") as f:
             sk = f.read()
     
+    #Create a signer with the provided sk
     signer = oqs.Signature(algo, secret_key= sk)
     print("Algorithm:", signer.details)
+    
     sign_times = []
     verify_times = []
     
+    # Sign and verify multiple times and record durations
     for _ in range(num_iterations):
         start = time.perf_counter()
         signature = signer.sign(msg)
         end = time.perf_counter()
         sign_times.append(end - start)
 
-    # Verify multiple times and record durations
     for _ in range(num_iterations):
         start = time.perf_counter()
         valid = signer.verify(msg, signature, pk)
@@ -59,6 +67,8 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
         verify_times.append(end - start)
     
     assert valid, "Verification step failed"
+    #If the signatures are not valid, something must have gone wrong.
+    
     return {"sign_times": sign_times,"verify_times": verify_times}
 
 #Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
