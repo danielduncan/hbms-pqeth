@@ -1,6 +1,6 @@
 from os import urandom
 from typing import Tuple, List
-from src.individual import l, k, n
+from src.individual import HashTweaks, l, k, n
 from src.individual.utils import H, PRF, merkle_tree
 
 # generate secret key sk, by randomly sampling a sequence of bits with any secure PRF
@@ -9,7 +9,7 @@ def WOTS_sk(seed: bytes) -> bytes:
 
 # generate public key pk, by hashing sk (H(sk)) 2^n-1 times, where n is the number of bits a secure hash function H outputs
 def WOTS_pk(sk: bytes) -> bytes:
-    return H(sk, 2**n - 1)
+    return H(sk, 2**n - 1, tweak=HashTweaks.CHAIN.value)
 
 # standard Winternitz One-Time Signature (WOTS) key generation
 def generate_key() -> Tuple[List[bytes], bytes]:
@@ -25,7 +25,7 @@ def generate_key() -> Tuple[List[bytes], bytes]:
         pks.append(pk)
 
     # aggregate public keys into one
-    return (sks, H(b''.join(pks)))
+    return (sks, H(b''.join(pks), tweak=HashTweaks.CHAIN.value))
 
 # TODO: SEQUENTIAL SLOTS WITH USE SYNCHRONISED WITH TIME
 # TODO: E.G. SLOT 0 IS USED AT EPOCH 0, SLOT 1 AT EPOCH 1, ETC.

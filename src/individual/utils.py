@@ -27,7 +27,7 @@ def merkle_tree(leaves: List[bytes]) -> Tuple[bytes, List[List[bytes]]]:
     while len(tree[-1]) > 1:
        level = []
        for i in range(0, len(tree[-1]), 2):
-            level.append(H(tree[-1][i] + tree[-1][i + 1]))
+            level.append(H(tree[-1][i] + tree[-1][i + 1], tweak=HashTweaks.TREE.value))
        tree.append(level)
 
     root = tree[-1][0]
@@ -50,9 +50,9 @@ def merkle_root(pk: bytes, path: List[bytes], index: int) -> bytes:
     node = pk
     for sibling in path:
         if index % 2 == 0:
-            node = H(node + sibling)
+            node = H(node + sibling, tweak=HashTweaks.TREE.value)
         else:
-            node = H(sibling + node)
+            node = H(sibling + node, tweak=HashTweaks.TREE.value)
         index //= 2
 
     return node
