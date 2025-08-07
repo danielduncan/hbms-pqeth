@@ -27,6 +27,10 @@ def generate_key() -> Tuple[List[bytes], bytes]:
     # aggregate public keys into one
     return (sks, H(b''.join(pks)))
 
+# TODO: SEQUENTIAL SLOTS WITH USE SYNCHRONISED WITH TIME
+# TODO: E.G. SLOT 0 IS USED AT EPOCH 0, SLOT 1 AT EPOCH 1, ETC.
+# TODO: REGENERATE TREE ONCE EXHAUSTED - I.E. ONCE INITIAL EPOCH + LIFETIME REACHED
+# TODO: BALANCE TREE SIZE AND REFRESH FREQUENCY
 # eXtended Merkle Signature Scheme (XMSS) key generation
 def xmss_keygen() -> Tuple[List[List[bytes]], bytes, List[List[bytes]]]:
     # slots are single use collections of WOTS secret keys
