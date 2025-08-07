@@ -1,17 +1,18 @@
 from typing import List, Tuple
-from src.individual import HASH_FUNCTION, HashTweaks
+from src.individual import HASH_FUNCTION, HashTweaks, HASH_LENGTH
 
 # secure hash function H, which can hash n times, and can take a tweak
 # defaults to SHA-256, but can be changed to any secure hash function
-def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HASH_FUNCTION) -> bytes:
+def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HASH_FUNCTION, length: int = HASH_LENGTH) -> bytes:
     # hash n times
     for _ in range(n):
         # a hash tweak of form H(x + a) makes hashes distinct for identical x
         # tweaks correspond to the application of the hash
         # tweaks are necessary to ensure different but related processes do not collide
         tweaked = x + tweak.to_bytes(1, byteorder='big')
-        # hash truncated to 16 bits for demo performance - THIS IS COMPLETELY INSECURE - NEVER USE IN PRODUCTION
-        x = function(tweaked).digest()[0:2]
+        # hash truncated to n bits for demo performance - THIS IS COMPLETELY INSECURE - NEVER USE IN PRODUCTION
+        x = function(tweaked).digest()[0:length]
+
     return x
 
 # secure PRF

@@ -11,7 +11,7 @@ def sign_message(sk: List[bytes], message: str) -> List[bytes]:
     for i, chunk in enumerate(get_chunks(message, w)):
         h = H(chunk.encode('ascii'), tweak=HashTweaks.MESSAGE.value)
         x = int.from_bytes(h, 'big')
-        sig.append(H(sk[i], x, tweak=HashTweaks.CHAIN.value))
+        sig.append(H(sk[i], n=x, tweak=HashTweaks.CHAIN.value))
 
     return sig
 

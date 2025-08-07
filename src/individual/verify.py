@@ -15,7 +15,7 @@ def verify_wots(sig: List[bytes], message: str) -> bytes:
         # number of times required to hash the signature to get the original pk
         j = (2 ** n - 1) - x
 
-        chunk_pk = H(sig[i], j, tweak=HashTweaks.CHAIN.value)
+        chunk_pk = H(sig[i], n=j, tweak=HashTweaks.CHAIN.value)
         pks.append(chunk_pk)
     
     # aggregate pks into one that should match the signers public key
