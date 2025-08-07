@@ -14,7 +14,7 @@ def main():
     message = message.ljust(w * l, ' ') # pad to multiple of l - in prod message would be fixed length
     print(f"Message to validate: {message}")
 
-    validators = 3
+    validators = randint(2, 6)
     print(f"Generating keypairs for {validators} validators")
     time_start = time()
     keys = [xmss_keygen() for _ in range(validators)]
