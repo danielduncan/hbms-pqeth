@@ -1,10 +1,14 @@
 import oqs
+import time
 
 #Define the algorithm used from liboqs.
-algo = "SPHINCS+-SHAKE-256f-robust+"
+algo = "SPHINCS+-SHA2-256f-simple"
+"""
+Use this to show what signature schemes are supported by liboqs
 print(oqs.get_enabled_sig_mechanisms())
 """
-with oqs.Signature(algo) as signer:
+def oqs_keygen(algo):
+    signer = oqs.Signature(algo)
     print("Algorithm:", signer.details)
 
     # Generate a keypair
@@ -12,15 +16,10 @@ with oqs.Signature(algo) as signer:
     sk = signer.export_secret_key()
     print(f"Public key length: {len(pk)} bytes")
     print(f"Secret key length: {len(sk)} bytes")
+    with open("sphincs_pk.bin", "wb") as f:
+        f.write(pk)
+    with open("sphincs_sk.bin", "wb") as f:
+        f.write(sk)
 
-    # Message to sign
-    message = b"Hello Ethereum"
-    
-    # Sign the message
-    signature = signer.sign(message)
-    print(f"Signature length: {len(signature)} bytes")
 
-    # Verify the signature
-    valid = signer.verify(message, signature, pk)
-    print("Signature valid:", valid)
-"""
+oqs_keygen(algo)
