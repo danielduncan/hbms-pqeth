@@ -10,8 +10,8 @@ def H(x: bytes, n: int = 1, tweak: int = HashTweaks.MESSAGE.value, function = HA
         # tweaks correspond to the application of the hash
         # tweaks are necessary to ensure different but related processes do not collide
         tweaked = x + tweak.to_bytes(1, byteorder='big')
-        # hash truncated to 16 bits for demo performance - THIS IS COMPLETELY INSECURE - NEVER USE IN PRODUCTION
-        x = function(tweaked).digest()[0:2]
+        x = function(tweaked).digest()
+
     return x
 
 # secure PRF
@@ -58,5 +58,5 @@ def merkle_root(pk: bytes, path: List[bytes], index: int) -> bytes:
     return node
 
 # split message into l chunks of length w
-def get_chunks(message: str, w: int) -> List[str]:
-    return [message[i:i + w] for i in range(0, len(message), w)]
+def get_chunks(message: bytes, w: int) -> List[bytes]:
+    return [message[i:i + w // 8] for i in range(0, len(message), w // 8)]
