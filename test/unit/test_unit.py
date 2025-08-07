@@ -12,6 +12,7 @@ from src.individual.verify import verify_signature, xmss_verify
 message_length = 4 * l # length of message must be divisible by l for sign_message to work
 message = ''.join(random.choices(string.ascii_letters + string.digits, k = message_length))
 index = random.randint(0, 2 ** k) # random index for slots
+keylen = 2 # expected key length
 
 def test_generate_key():
     # generate_key
@@ -19,10 +20,10 @@ def test_generate_key():
     assert pk is not None
     assert sks is not None
     assert isinstance(pk, bytes)
-    assert len(pk) == 2
+    assert len(pk) == keylen
     for sk in sks:
         assert isinstance(sk, bytes)
-        assert len(sk) == 2
+        assert len(sk) == keylen
 
 def test_xmss_keygen():
     # xmss_keygen
@@ -31,7 +32,7 @@ def test_xmss_keygen():
     for sks in slots:
         for sk in sks:
             assert isinstance(sk, bytes)
-            assert len(sk) == 2
+            assert len(sk) == keylen
 
 def test_sign_message():
     # setup
