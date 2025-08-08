@@ -1,14 +1,15 @@
 from enum import Enum
 from hashlib import sha256
+from blake3 import blake3
 
 HASH_FUNCTION = sha256
+n: int = 256 # number of bits secure hash function H outputs
+KEY_LIFETIME: int = 10 # lifetime of XMSS keys in epochs TODO: equal to number of leaves i.e. 2^k?
 
-# l = 4 is small - probably insecure
-l = 4 # message split into l chunks of w bits
+w: int = 8 # chunk size in bits
+l: int = n // w # number of chunks in a message
 # k = 5 gives 2^5 leaves / public keys - adjust depending on l and w
-k = 5 # tree depth
-# n = 16 so the demo runs quickly - NEVER USE IN PRODUCTION
-n = 16 # number of bits secure hash function H outputs
+k: int = 5 # tree depth
 
 # hash tweaks
 class HashTweaks(Enum):
