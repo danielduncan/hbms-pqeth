@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from src.individual.utils import H, get_chunks
-from src.individual import HashTweaks, w
+from src import HashTweaks, w
 
 # standard Winternitz One-Time Signature (WOTS) message signing
 def sign_message(sk: List[bytes], message: str) -> List[bytes]:

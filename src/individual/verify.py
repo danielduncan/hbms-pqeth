@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from src.individual.utils import H, get_chunks, merkle_root
-from src.individual import HashTweaks, w
+from src import HashTweaks, w
 
 # standard Winternitz One-Time Signature (WOTS) signature verification
 def verify_wots(sig: List[bytes], message: str) -> bytes:
