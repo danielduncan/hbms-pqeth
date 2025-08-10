@@ -29,19 +29,13 @@ def main():
         print(f"\t Signature valid: {xmss_verify(sig, message, pk)}")
         print(f"\t Verification took {time() - time_start:.3f} seconds")
 
-    print(f"Running SNARK signature verification")
+    print(f"Running SNARK signature aggregation")
     time_start = time()
     try:
         result = aggregate_signatures(message, signatures)
 
         print(f"\t SNARKs took {time() - time_start:.3f} seconds")
         print(f"\t Success: {result['success']}")
-        print(f"\t Signatures valid: {result['verification_successful']}")
-
-        if result['stdout']:
-            print(f"\t Output: {result['stdout']}")
-        if result['stderr']:
-            print(f"\t Error: {result['stderr']}")
 
     except Exception as e:
         print(f"\t Circuit execution failed with exception {e}")
@@ -52,6 +46,7 @@ def main():
         result = aggregate_verify(signatures, message)
         print(f"\t Verification took {time() - time_start:.3f} seconds")
         print(f"\t Aggregated signature valid: {result}")
+
     except Exception as e:
         print(f"\t Verification failed with exception {e}")
 

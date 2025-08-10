@@ -2,7 +2,15 @@
 
 Based on https://eprint.iacr.org/2025/055.pdf, hbms-pqeth is a highly modular, simple (hence Python) proof of concept, created to demonstrate and explain the implementation of hash-based multi-signatures. Furthermore, (not post-quantum) SNARK aggregation is demonstrated and implemented so different SNARKs can be used, for when pqSNARKs reach maturity.
 
-## Breakdown
+# Setup
+
+Install Python for WOTS and XMSS (https://www.python.org/downloads/), and Noir (https://noir-lang.org/docs/getting_started/quick_start) for SNARKs.
+
+To install requirements: `pip install -r requirements.txt`
+
+To run: `python -m demo.demo`
+
+# Breakdown
 
 src is split into the individual signature scheme, and the public aggregation process.
 
