@@ -1,6 +1,6 @@
 use sha256;
 
-global N: u32 = 2; // number of sigs to aggregate
+global N: u32 = 10; // number of sigs to aggregate
 global W: u32 = 128 / 8; // WOTS param in bytes
 global K: u32 = 2; // tree depth
 global STRLEN: u32 = 28;
