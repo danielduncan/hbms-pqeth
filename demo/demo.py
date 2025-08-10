@@ -35,7 +35,7 @@ def main():
         result = aggregate_signatures(message, signatures)
 
         print(f"\t SNARKs took {time() - time_start:.3f} seconds")
-        print(f"\t Success: {result['success']}")
+        print(f"\t Witness success: {result['witness success']}, Proof success: {result['proof success']}")
 
     except Exception as e:
         print(f"\t Circuit execution failed with exception {e}")
@@ -43,7 +43,7 @@ def main():
     print(f"Verifying aggregated signature")
     time_start = time()
     try:
-        result = aggregate_verify(signatures, message)
+        result = aggregate_verify(signatures)
         print(f"\t Verification took {time() - time_start:.3f} seconds")
         print(f"\t Aggregated signature valid: {result}")
 

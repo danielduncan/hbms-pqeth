@@ -53,6 +53,26 @@ class NoirHarness:
             os.chdir(self.dir)
             
             try:
+                # TODO: move to first time only function
+                # check the circuit, create Prover.toml
+                cmd = ["nargo", "check"]
+
+                result = subprocess.run(
+                    cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=60 # 60s
+                )
+            
+                if result.returncode != 0:
+                    return {
+                        "success": False,
+                        "error": "nargo check failed",
+                        "stdout": result.stdout,
+                        "stderr": result.stderr,
+                        "returncode": result.returncode
+                    }
+
                 # execute Noir
                 cmd = ["nargo", "execute"]
 
@@ -91,3 +111,43 @@ class NoirHarness:
                 "returncode": -1
             }
     
+    # TODO: replace hardlinks (there for convenience)
+    def prove(self) -> bool:
+        try:
+            cmd = ["bb", "prove", "-b", "./zkp/target/zkp.json", "-w", "./zkp/target/zkp.gz", "-o", "./zkp/target"]
+
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=600 # 10 mins
+            )
+
+            return result.returncode == 0
+        
+        except subprocess.TimeoutExpired:
+            return False
+
+    def generate_vk(self) -> str:
+        cmd = ["bb", "write_vk", "-b", "./zkp/target/zkp.json", "-o", "./zkp/target"]
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=600 # 10 mins
+        )
+
+        return str(self.dir / "target" / "vk")
+
+    def verify(self, vk: str) -> bool:
+        cmd = ["bb", "verify", "-k", vk, "-p", "./zkp/target/proof", "-i", "./zkp/target/public_inputs"]
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=60 # 60s
+        )
+
+        return result.returncode == 0
