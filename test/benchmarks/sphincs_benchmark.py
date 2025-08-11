@@ -8,7 +8,7 @@ def example_benchmark(algo):
     #Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
     oqs_keygen(algo)
 
-    res = time_sign_verif(algo)
+    res = time_sign_verif(algo, b'02e70180843b9aca0084773594008252089411111111111111111111111111111111111111118080c0')
     num_iterations = 50
     sign_times = res["sign_times"]
     verify_times = res["verify_times"]
