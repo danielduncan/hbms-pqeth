@@ -1,16 +1,11 @@
-from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 from time import time
 from random import randint
-
 from src.scheme import HBMS, Scheme
 
-from src.individual.keygen import xmss_keygen
-from src.individual.sign import xmss_sign
-from src.individual.verify import xmss_verify
 
 def main():
-    lifetime = 4 # lifetime of keypairs in epochs
+    lifetime = 4 # log2(lifetime of keypairs in epochs)
     N = 4 # number of validators
 
     # validating a recent Ethereum block https://etherscan.io/block/23110384
@@ -50,7 +45,6 @@ def main():
     validator = validators[randint(0, N - 1)]
     try:
         result = validator.aggregate_signatures(blockhash, signatures)
-
         print(f"\t SNARKs took {time() - time_start:.3f} seconds")
         print(f"\t Witness success: {result['witness success']}, Proof success: {result['proof success']}")
 
