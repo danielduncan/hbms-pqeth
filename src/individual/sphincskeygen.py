@@ -50,27 +50,26 @@ def time_sign_verif(algo = default_algo, msg = b"hello world",num_iterations = 5
     #Create a signer with the provided sk
     signer = oqs.Signature(algo, secret_key= sk)
     print("Algorithm:", signer.details)
-    
-    sign_times = []
-    verify_times = []
+
     
     # Sign and verify multiple times and record durations
+    start = time.perf_counter()
     for _ in range(num_iterations):
-        start = time.perf_counter()
         signature = signer.sign(msg)
-        end = time.perf_counter()
-        sign_times.append(end - start)
-
+    end = time.perf_counter()
+    sign_time = (start-end)/num_iterations
+    
+    start = time.perf_counter()
     for _ in range(num_iterations):
         start = time.perf_counter()
         valid = signer.verify(msg, signature, pk)
-        end = time.perf_counter()
-        verify_times.append(end - start)
+    end = time.perf_counter()
+    verify_time = (start-end)/num_iterations
     
     assert valid, "Verification step failed"
     #If the signatures are not valid, something must have gone wrong.
     
-    return {"sign_times": sign_times,"verify_times": verify_times, "length" : signer.details['length_signature'], "sk_len" : signer.details['length_secret_key'] , "pk_len" : signer.details['length_public_key']}
+    return {"sign_times": sign_time,"verify_times": verify_time, "length" : signer.details['length_signature'], "sk_len" : signer.details['length_secret_key'] , "pk_len" : signer.details['length_public_key']}
 
 
 #Example benchmarking script for sphincs+, can be made flexible to compare other schemes.
@@ -81,8 +80,8 @@ def example_benchmark():
     num_iterations = 50
     sign_times = res["sign_times"]
     verify_times = res["verify_times"]
-    print(f"Average signing time:  {sum(sign_times) / num_iterations * 1000:.2f} ms")
-    print(f"Average verify time:   {sum(verify_times) / num_iterations * 1000:.2f} ms")
+    print(f"Average signing time:  {sign_times * 1000:.2f} ms")
+    print(f"Average verify time:   {verify_times * 1000:.2f} ms")
 
 if __name__ == "__main__":
     example_benchmark()
