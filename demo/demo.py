@@ -2,20 +2,19 @@ from concurrent.futures import ThreadPoolExecutor
 from time import time
 from random import randint
 
-from src.individual import k
+from src import k
+from demo import validators, message
 
 from src.individual.keygen import xmss_keygen
 from src.individual.sign import xmss_sign
 from src.individual.verify import xmss_verify
+from src.aggregation.aggregate import aggregate_signatures, aggregate_verify
 
 def main():
     # take some input message (pretend this is a block in the Ethereum context) to validate
     epoch = randint(0, 100) # arbitrary epoch number
-    message = "placeholder message for demo"
     print(f"Message to validate: {message}")
 
-    validators = randint(2, 6)
-    # concurrent validators
     print(f"Running with {validators} validators")
     with ThreadPoolExecutor() as executor:
         signatures = list(executor.map(lambda idx: validator(idx, epoch, message), range(validators)))
@@ -29,6 +28,27 @@ def main():
         print(f"\t Path (truncated): {[p.hex()[0:4] for p in sig[2]]}")
         print(f"\t Signature valid: {xmss_verify(sig, message, pk)}")
         print(f"\t Verification took {time() - time_start:.3f} seconds")
+
+    print(f"Running SNARK signature aggregation")
+    time_start = time()
+    try:
+        result = aggregate_signatures(message, signatures)
+
+        print(f"\t SNARKs took {time() - time_start:.3f} seconds")
+        print(f"\t Witness success: {result['witness success']}, Proof success: {result['proof success']}")
+
+    except Exception as e:
+        print(f"\t Circuit execution failed with exception {e}")
+
+    print(f"Verifying aggregated signature")
+    time_start = time()
+    try:
+        result = aggregate_verify(signatures)
+        print(f"\t Verification took {time() - time_start:.3f} seconds")
+        print(f"\t Aggregated signature valid: {result}")
+
+    except Exception as e:
+        print(f"\t Verification failed with exception {e}")
 
 def validator(idx: int, epoch: int, message: str):
     current_epoch = epoch + 1 # aribitrary current epoch

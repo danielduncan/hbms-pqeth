@@ -1,6 +1,6 @@
 from os import urandom
 from typing import Tuple, List
-from src.individual import HashTweaks, l, k, w, KEY_LIFETIME
+from src import HashTweaks, l, k, w, KEY_LIFETIME
 from src.individual.utils import H, PRF, merkle_tree
 from concurrent.futures import ThreadPoolExecutor
 
