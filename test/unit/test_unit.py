@@ -2,22 +2,28 @@ import pytest
 import math
 import random
 import string
+from hashlib import sha256
 from src.aggregation.aggregate import aggregate_signatures
-from src import n, k, l, HashTweaks, KEY_LIFETIME
+from src import HashTweaks
 from src.individual.keygen import generate_key, xmss_keygen
 from src.individual.sign import sign_message, xmss_sign
 from src.individual.utils import H, PRF, merkle_tree, merkle_root, get_chunks
 from src.individual.verify import verify_signature, xmss_verify
+from src.scheme import HBMS, Scheme
 
-epoch = random.randint(0, KEY_LIFETIME)
-message_length = 4 * l # length of message must be divisible by l for sign_message to work
-message = ''.join(random.choices(string.ascii_letters + string.digits, k = message_length))
+epoch = random.randint(0, 10000)
+w = 128
+l = 2
+k = 5
+SCHEME = HBMS(H=sha256, N=1, n=256, w=w, k=k)
+message_length = 32 # 32 byte message
+message = ''.join(random.choices(string.ascii_letters + string.digits, k = message_length)).encode('ascii')
 index = random.randint(0, 2 ** k) # random index for slots
 keylen = 32 # expected key length
 
 def test_generate_key():
     # generate_key
-    sks, pk = generate_key()
+    sks, pk = generate_key(w, l)
     assert pk is not None
     assert sks is not None
     assert isinstance(pk, bytes)
@@ -28,7 +34,7 @@ def test_generate_key():
 
 def test_xmss_keygen():
     # xmss_keygen
-    slots, root, paths = xmss_keygen(epoch)
+    slots, root, paths = xmss_keygen(w, k, l)
 
     for sks in slots:
         for sk in sks:
@@ -37,10 +43,10 @@ def test_xmss_keygen():
 
 def test_sign_message():
     # setup
-    sks, pk = generate_key()
+    sks, pk = generate_key(w, l)
 
     # sign_message
-    signatures = sign_message(sks, message)
+    signatures = sign_message(sks, message, w)
     for sig in signatures:
         assert isinstance(sig, bytes)
     str_sig = ''.join(b.decode('latin1') for b in signatures)
@@ -48,10 +54,12 @@ def test_sign_message():
 
 def test_xmss_sign():
     # setup
-    slots, root, paths = xmss_keygen(epoch)
+    slots, root, paths = xmss_keygen(w, k, l)
+    slots = slots[index]
+    path = paths[index]
 
     # xmss_sign
-    _, wots, path = xmss_sign(slots, index, message, paths)
+    wots, path = xmss_sign(slots, message, path, w)
     for sig in wots:
         assert isinstance(sig, bytes)
     str_sig = ''.join(b.decode('latin1') for b in wots)
@@ -97,16 +105,17 @@ def test_get_chunks():
 
 def test_verify_signature():
     # setup
-    sks, pk = generate_key()
-    signature = sign_message(sks, message)
+    sks, pk = generate_key(w, l)
+    signature = sign_message(sks, message, w)
 
     # verify_signature
-    assert verify_signature(signature, message, pk)
+    assert verify_signature(signature, message, pk, w)
 
 def test_xmss_verify():
     # setup
-    slots, root, paths = xmss_keygen(epoch)
-    sig = xmss_sign(slots, index, message, paths)
+    slots, root, paths = xmss_keygen(w, k, l)
+    a, b = xmss_sign(slots[index], message, paths[index], w)
+    sig = (root, (index, a, b))
 
     # xmss_verify
-    assert xmss_verify(sig, message, root)
+    assert xmss_verify(sig, message, root, w)

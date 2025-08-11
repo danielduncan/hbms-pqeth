@@ -46,7 +46,7 @@ class Scheme:
         self.pk = keys[1]
         self.paths = keys[2]
 
-        return True
+        return (self.sks, self.pk, self.paths)
 
     def sign(self, message, epoch):
         slot = epoch - self.birthepoch
