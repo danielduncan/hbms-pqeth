@@ -5,14 +5,17 @@ Based on https://eprint.iacr.org/2025/055.pdf, hbms-pqeth is a highly modular, s
 # Setup
 
 Install Python for WOTS and XMSS (https://www.python.org/downloads/), and Noir (https://noir-lang.org/docs/getting_started/quick_start) for SNARKs.
+Install liboqs-python for SPHINCS+ (https://github.com/open-quantum-safe/liboqs-python)
 
 To install requirements: `pip install -r requirements.txt`
 
 To run: `python -m demo.demo`
+For the SPHINCS+ part 'python -m test/benchmarks
 
 # Demo
 
 See demo/demo.py for a demo of the scheme.
+src/individual/sphincskeygen.py contains an example of the scheme.
 
 # Breakdown
 
@@ -23,6 +26,8 @@ src is split into the individual signature scheme, and the public aggregation pr
 WOTS is Winternitz One-Time Signature. These form the basis of the post-quantum hash-based multi-signatures.
 
 WOTS are combined with XMSS (eXtended Merkle Signature Scheme) for relatively compact signatures.
+
+SPHINCS+ benchmarking using LIBOQS (Open Quantum Safe Library)
 
 ### Aggregation
 
