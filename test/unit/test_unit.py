@@ -3,7 +3,7 @@ import math
 import random
 import string
 from src.aggregation.aggregate import aggregate_signatures
-from src.individual import n, k, l, HashTweaks, KEY_LIFETIME
+from src import n, k, l, HashTweaks, KEY_LIFETIME
 from src.individual.keygen import generate_key, xmss_keygen
 from src.individual.sign import sign_message, xmss_sign
 from src.individual.utils import H, PRF, merkle_tree, merkle_root, get_chunks
