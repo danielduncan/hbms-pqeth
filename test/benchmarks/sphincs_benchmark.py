@@ -8,7 +8,7 @@ def example_benchmark(algo):
     #Regenerate keys before running test sets. This is especially true if you have changed the algorithm.
     keygen_time = oqs_keygen(algo)
 
-    res = time_sign_verif(algo, b'02e70180843b9aca0084773594008252089411111111111111111111111111111111111111118080c0', 10)
+    res = time_sign_verif(algo, b'02e70180843b9aca0084773594008252089411111111111111111111111111111111111111118080c0', 50)
     sign_times = res["sign_times"]
     verify_times = res["verify_times"]
     sign_length = res['length']
@@ -19,7 +19,7 @@ def example_benchmark(algo):
     return [algo, sign_times * 1000, verify_times * 1000, sign_length,sk_length,pk_length, keygen_time]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with open('sphincs_res.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         results_list = [['algorithm name','sign time', 'verify time', 'signature length', 'secret key length', 'public key length', 'keygen time']]
