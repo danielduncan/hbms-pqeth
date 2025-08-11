@@ -31,7 +31,7 @@ class NoirHarness:
 
             noir_pks.append(list(pk))
 
-        """         # pad to MAX values in main.nr
+        """ # pad to MAX values in main.nr
         while len(noir_sigs) < 100:
             dummy_wots = [list(sig) for sig in signatures[0][1]]
             dummy_path = [list(p) for p in signatures[0][2]]
@@ -41,19 +41,14 @@ class NoirHarness:
             ]
             noir_sigs.append(dummy_sig)
             noir_pks.append([0] * (self.LEN // 8))
-        
+        """
+
         return {
             "N": self.N,
             "LEN": self.LEN,
             "W": self.W,
             "L": self.L,
             "K": self.K,
-            "message": noir_message,
-            "sigs": noir_sigs,
-            "pks": noir_pks
-        } """
-
-        return {
             "message": noir_message,
             "sigs": noir_sigs,
             "pks": noir_pks
