@@ -57,14 +57,14 @@ def time_sign_verif(algo = default_algo, msg = b"hello world",num_iterations = 5
     for _ in range(num_iterations):
         signature = signer.sign(msg)
     end = time.perf_counter()
-    sign_time = (start-end)/num_iterations
+    sign_time = (end-start)/num_iterations
     
     start = time.perf_counter()
     for _ in range(num_iterations):
         start = time.perf_counter()
         valid = signer.verify(msg, signature, pk)
     end = time.perf_counter()
-    verify_time = (start-end)/num_iterations
+    verify_time = (end-start)/num_iterations
     
     assert valid, "Verification step failed"
     #If the signatures are not valid, something must have gone wrong.
