@@ -61,7 +61,6 @@ def time_sign_verif(algo = default_algo, msg = b"hello world",num_iterations = 5
     
     start = time.perf_counter()
     for _ in range(num_iterations):
-        start = time.perf_counter()
         valid = signer.verify(msg, signature, pk)
     end = time.perf_counter()
     verify_time = (end-start)/num_iterations
