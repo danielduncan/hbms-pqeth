@@ -10,7 +10,7 @@ Install liboqs-python for SPHINCS+ (https://github.com/open-quantum-safe/liboqs-
 To install requirements: `pip install -r requirements.txt`
 
 To run: `python -m demo.demo`
-For the SPHINCS+ part 'python -m test/benchmarks
+For the SPHINCS+ part `python -m test.benchmarks.sphincs_benchmark`
 
 # Demo
 
