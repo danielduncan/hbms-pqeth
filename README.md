@@ -10,6 +10,10 @@ To install requirements: `pip install -r requirements.txt`
 
 To run: `python -m demo.demo`
 
+# Demo
+
+See demo/demo.py for a demo of the scheme.
+
 # Breakdown
 
 src is split into the individual signature scheme, and the public aggregation process.
