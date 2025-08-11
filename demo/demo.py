@@ -1,38 +1,55 @@
 from concurrent.futures import ThreadPoolExecutor
+from hashlib import sha256
 from time import time
 from random import randint
 
-from src import k
-from demo import validators, message
+from src.scheme import HBMS, Scheme
 
 from src.individual.keygen import xmss_keygen
 from src.individual.sign import xmss_sign
 from src.individual.verify import xmss_verify
-from src.aggregation.aggregate import aggregate_signatures, aggregate_verify
 
 def main():
-    # take some input message (pretend this is a block in the Ethereum context) to validate
-    epoch = randint(0, 100) # arbitrary epoch number
-    print(f"Message to validate: {message}")
+    lifetime = 4 # lifetime of keypairs in epochs
+    N = 4 # number of validators
 
-    print(f"Running with {validators} validators")
-    with ThreadPoolExecutor() as executor:
-        signatures = list(executor.map(lambda idx: validator(idx, epoch, message), range(validators)))
+    # validating a recent Ethereum block https://etherscan.io/block/23110384
+    (blockhash, epoch) = (bytes.fromhex("eafbdd75941e56f899b2b4cda6959f2b3ddfce8cb1a4d78843ba86730913d493"), 385420)
+    print(f"Validating block hash {blockhash.hex()} at epoch {epoch}")
 
-    print(f"Verifying individual signatures")
-    for i, (pk, sig) in enumerate(signatures):
-        print(f"Verifying validator {i}'s signatures:")
+    SCHEME = HBMS(H=sha256, N=N, n=256, w=128, k=lifetime)
+
+    print(f"{N} validators being created:")
+    validators = []
+    for _ in range(N):
+        validators.append(Scheme(SCHEME))
+
+    print(f"Validators created, now each generates their keys")
+    for i, validator in enumerate(validators):
         time_start = time()
-        print(f"\t Public key: {pk.hex()}")
-        print(f"\t Signature (truncated): {[s.hex()[0:4] for s in sig[1]]}")
-        print(f"\t Path (truncated): {[p.hex()[0:4] for p in sig[2]]}")
-        print(f"\t Signature valid: {xmss_verify(sig, message, pk)}")
-        print(f"\t Verification took {time() - time_start:.3f} seconds")
+        validator.keygen(epoch)
+        print(f"\t Validator {i}'s public key: {validator.pk.hex()} generated in {time() - time_start:.3f} seconds")
 
-    print(f"Running SNARK signature aggregation")
+    print("Now each validator signs the block hash")
+    signatures = []
+    for i, validator in enumerate(validators):
+        print(f"\t Validator {i} signing block hash")
+        time_start = time()
+        signatures.append((validator.pk, validator.sign(blockhash, epoch)))
+        print(f"\t Validator {i} signed block hash in {time() - time_start:.3f} seconds")
+
+    print("Now each verifies another signature")
+    for i, validator in enumerate(validators):
+        print(f"\t Validator {i} verifying validator {(i + 1) % N}'s signature")
+        time_start = time()
+        valid = validator.verify(signatures[(i + 1) % N], blockhash, validators[(i + 1) % N].pk)
+        print(f"\t Verification took {time() - time_start:.3f} seconds, valid: {valid}")
+
+    print("Now signatures are aggregated by a random validator using SNARKs")
     time_start = time()
+    validator = validators[randint(0, N - 1)]
     try:
-        result = aggregate_signatures(message, signatures)
+        result = validator.aggregate_signatures(blockhash, signatures)
 
         print(f"\t SNARKs took {time() - time_start:.3f} seconds")
         print(f"\t Witness success: {result['witness success']}, Proof success: {result['proof success']}")
@@ -40,34 +57,17 @@ def main():
     except Exception as e:
         print(f"\t Circuit execution failed with exception {e}")
 
-    print(f"Verifying aggregated signature")
-    time_start = time()
-    try:
-        result = aggregate_verify(signatures)
-        print(f"\t Verification took {time() - time_start:.3f} seconds")
-        print(f"\t Aggregated signature valid: {result}")
+    print(f"Now all validators verify the aggregated signature")
+    for validator in validators:
+        print(f"\t Validator {validator.pk.hex()} verifying aggregated signature")
+        time_start = time()
+        try:
+            result = validator.aggregate_verify()
+            print(f"\t Verification took {time() - time_start:.3f} seconds")
+            print(f"\t Aggregated signature valid: {result}")
 
-    except Exception as e:
-        print(f"\t Verification failed with exception {e}")
-
-def validator(idx: int, epoch: int, message: str):
-    current_epoch = epoch + 1 # aribitrary current epoch
-
-    print(f"{idx}: generating keypairs")
-    time_start = time()
-    keys = xmss_keygen(current_epoch)
-    print(f"{idx}: generated keys in {time() - time_start:.3f} seconds:")
-    print(f"{idx}: has public key {keys[1].hex()}")
-
-    print(f"{idx}: signing message")
-    time_start = time()
-    slots = keys[0]
-    index = randint(0, k) # randomly select a slot to use TODO: make this epoch
-    pk = keys[1]
-    path = keys[2]
-    sig = (pk, xmss_sign(slots, index, message, path))
-    print(f"{idx}: signed message in {time() - time_start} seconds")
-    return sig
+        except Exception as e:
+            print(f"\t Verification failed with exception {e}")
 
 if __name__ == "__main__":
     main()

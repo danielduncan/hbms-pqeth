@@ -1,6 +1,6 @@
 from os import urandom
 from typing import Tuple, List
-from src import HashTweaks, l, k, w, KEY_LIFETIME
+from src import HashTweaks
 from src.individual.utils import H, PRF, merkle_tree
 from concurrent.futures import ThreadPoolExecutor
 
@@ -9,11 +9,11 @@ def WOTS_sk(seed: bytes) -> bytes:
     return PRF(seed)
 
 # generate public key pk, by hashing sk w times (H^w(sk))
-def WOTS_pk(sk: bytes) -> bytes:
+def WOTS_pk(sk: bytes, w: int) -> bytes:
     return H(sk, n=w, tweak=HashTweaks.CHAIN.value)
 
 # standard Winternitz One-Time Signature (WOTS) key generation
-def generate_key() -> Tuple[List[bytes], bytes]:
+def generate_key(w: int, l: int) -> Tuple[List[bytes], bytes]:
     sks: List[bytes] = []
     pks: List[bytes] = []
 
@@ -21,19 +21,15 @@ def generate_key() -> Tuple[List[bytes], bytes]:
     for _ in range(l):
         seed: bytes = urandom(32)
         sk: bytes = WOTS_sk(seed)
-        pk: bytes = WOTS_pk(sk)
+        pk: bytes = WOTS_pk(sk, w)
         sks.append(sk)
         pks.append(pk)
 
     # aggregate public keys into one
     return (sks, H(b''.join(pks), tweak=HashTweaks.CHAIN.value))
 
-# TODO: SEQUENTIAL SLOTS - USE SYNCHRONISED WITH TIME
-# TODO: E.G. SLOT 0 IS USED AT EPOCH 0, SLOT 1 AT EPOCH 1, ETC.
-# TODO: REGENERATE TREE ONCE EXHAUSTED - I.E. ONCE INITIAL EPOCH + LIFETIME REACHED
-# TODO: BALANCE TREE SIZE AND REFRESH FREQUENCY
 # eXtended Merkle Signature Scheme (XMSS) key generation
-def xmss_keygen(epoch: int, lifetime: int = KEY_LIFETIME) -> Tuple[List[List[bytes]], bytes, List[List[bytes]]]:
+def xmss_keygen(w: int, k: int, l: int) -> Tuple[List[List[bytes]], bytes, List[List[bytes]]]:
     # slots are single use collections of WOTS secret keys
     slots: List[List[bytes]] = []
     # WOTS public keys form the leaves of a Merkle tree
@@ -41,7 +37,7 @@ def xmss_keygen(epoch: int, lifetime: int = KEY_LIFETIME) -> Tuple[List[List[byt
     # parallelise
     with ThreadPoolExecutor() as executor:
         # tree depth is k, so generate 2^k secret keys (leaves)
-        results = list(executor.map(lambda _: generate_key(), range(2 ** k)))
+        results = list(executor.map(lambda _: generate_key(w, l), range(2 ** k)))
     for sks, pk in results:
        slots.append(sks)
        leaves.append(pk)

@@ -3,27 +3,24 @@ import os
 import toml
 from typing import List, Tuple, Dict, Any
 from pathlib import Path
-from src import n, w, l, k
-from demo import validators, strlen
 
 class NoirHarness:
-    def __init__(self):
+    def __init__(self, n: int, N: int, w: int, l: int, k: int):
         self.dir = Path("zkp")
         self.prover = self.dir / "Prover.toml"
 
-        self.N = validators # number of sigs
-        self.W = w # chunk length
-        self.L = l # number of sigs
+        self.N = N # number of signatures
+        self.LEN = n # bitlength of message/hash
+        self.W = w # chunk width
+        self.L = l # number of signatures
         self.K = k # Merkle tree depth
-        self.STRLEN = strlen # length of message
-        self.HASHLEN = n // 8 # length of hash output in bytes
-    
-    def prover_format(self, message: str, signatures: List[Tuple]) -> Dict[str, Any]:
-        noir_message = list(message.encode('ascii'))
+
+    def prover_format(self, message: bytes, signatures: List[Tuple]) -> Dict[str, Any]:
+        noir_message = list(message)
 
         noir_sigs = []
         noir_pks = []
-        
+
         for pk, sig in signatures:
             index, wots_sig, path = sig
 
@@ -34,13 +31,35 @@ class NoirHarness:
 
             noir_pks.append(list(pk))
 
+        """         # pad to MAX values in main.nr
+        while len(noir_sigs) < 100:
+            dummy_wots = [list(sig) for sig in signatures[0][1]]
+            dummy_path = [list(p) for p in signatures[0][2]]
+            dummy_sig = [0,
+                dummy_wots,
+                dummy_path,
+            ]
+            noir_sigs.append(dummy_sig)
+            noir_pks.append([0] * (self.LEN // 8))
+        
+        return {
+            "N": self.N,
+            "LEN": self.LEN,
+            "W": self.W,
+            "L": self.L,
+            "K": self.K,
+            "message": noir_message,
+            "sigs": noir_sigs,
+            "pks": noir_pks
+        } """
+
         return {
             "message": noir_message,
             "sigs": noir_sigs,
             "pks": noir_pks
         }
-    
-    def execute_circuit(self, message: str, signatures: List[Tuple]) -> Dict[str, Any]:
+
+    def execute_circuit(self, message: bytes, signatures: List[Tuple]) -> Dict[str, Any]:
         try:
             # generate prover TOML
             data = self.prover_format(message, signatures)

@@ -1,9 +1,10 @@
 from typing import List, Tuple
-from src import HASH_FUNCTION, HashTweaks
+from src import HashTweaks
+from hashlib import sha256
 
 # secure hash function H, which can hash n times, and can take a tweak
 # defaults to SHA-256, but can be changed to any secure hash function
-def H(x: bytes, n: int = 1, tweak: int = -1, function = HASH_FUNCTION) -> bytes:
+def H(x: bytes, n: int = 1, tweak: int = -1, function = sha256) -> bytes:
     # hash n times
     for _ in range(n):
         # a hash tweak of form H(x + a) makes hashes distinct for identical x
@@ -41,7 +42,7 @@ def merkle_tree(leaves: List[bytes]) -> Tuple[bytes, List[List[bytes]]]:
         path: List[bytes] = []
         node = i
         for level in range(len(tree) - 1):
-           sibling = node ^ 1 # flip last bit to go left or right...?
+           sibling = node ^ 1
            path.append(tree[level][sibling])
            node = node // 2
         paths.append(path)
