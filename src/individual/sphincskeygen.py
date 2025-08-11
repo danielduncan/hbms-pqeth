@@ -33,7 +33,7 @@ Message must be a byte string.
 Returns a dictionary with the list of sign times and verification times.
 algo must be one defined by the liboqs library. 
 """
-def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_algo):
+def time_sign_verif(algo = default_algo, msg = b"hello world",num_iterations = 50):
     #Try to open an existing pk/sk pair, if it does not exist, generate one.
     try:
         with open("sphincs_pk.bin", "rb") as f:
@@ -70,7 +70,7 @@ def time_sign_verif(msg = b"hello world",num_iterations = 50 ,algo = default_alg
     assert valid, "Verification step failed"
     #If the signatures are not valid, something must have gone wrong.
     
-    return {"sign_times": sign_times,"verify_times": verify_times}
+    return {"sign_times": sign_times,"verify_times": verify_times, "length" : signer.details['length_signature'], "sk_len" : signer.details['length_secret_key'] , "pk_len" : signer.details['length_public_key']}
 
 
 #Example benchmarking script for sphincs+, can be made flexible to compare other schemes.
