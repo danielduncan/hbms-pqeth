@@ -18,14 +18,17 @@ def oqs_keygen(algo = default_algo):
     signer = oqs.Signature(algo)
 
     # Generate a keypair
+    start = time.perf_counter()
     pk = signer.generate_keypair()
     sk = signer.export_secret_key()
+    end = time.perf_counter()
     print(f"Public key length: {len(pk)} bytes")
     print(f"Secret key length: {len(sk)} bytes")
     with open("sphincs_pk.bin", "wb") as f:
         f.write(pk)
     with open("sphincs_sk.bin", "wb") as f:
         f.write(sk)
+    return end - start
 
 """
 time the signing and verification of an algorithm from liboqs (Default iterations is 50 iterations, and algorithm is defined above)
