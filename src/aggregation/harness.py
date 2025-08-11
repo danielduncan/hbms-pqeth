@@ -31,18 +31,6 @@ class NoirHarness:
 
             noir_pks.append(list(pk))
 
-        """ # pad to MAX values in main.nr
-        while len(noir_sigs) < 100:
-            dummy_wots = [list(sig) for sig in signatures[0][1]]
-            dummy_path = [list(p) for p in signatures[0][2]]
-            dummy_sig = [0,
-                dummy_wots,
-                dummy_path,
-            ]
-            noir_sigs.append(dummy_sig)
-            noir_pks.append([0] * (self.LEN // 8))
-        """
-
         return {
             "N": self.N,
             "LEN": self.LEN,
@@ -67,7 +55,6 @@ class NoirHarness:
             os.chdir(self.dir)
             
             try:
-                # TODO: move to first time only function
                 # check the circuit, create Prover.toml
                 cmd = ["nargo", "check"]
 
@@ -124,8 +111,7 @@ class NoirHarness:
                 "stderr": str(e),
                 "returncode": -1
             }
-    
-    # TODO: replace hardlinks (there for convenience)
+
     def prove(self) -> bool:
         try:
             cmd = ["bb", "prove", "-b", "./zkp/target/zkp.json", "-w", "./zkp/target/zkp.gz", "-o", "./zkp/target"]

@@ -1,11 +1,8 @@
-from enum import Enum
-from hashlib import sha256
 from typing import Callable
 from src.individual.keygen import xmss_keygen
 from src.individual.sign import xmss_sign
 from src.individual.verify import xmss_verify
 from src.aggregation.aggregate import aggregate_signatures, aggregate_verify
-
 from src.aggregation.harness import NoirHarness
 
 """
